@@ -197,5 +197,119 @@ __Fig 4A 中的方法能够有效检测接入内网的 NAT AP，即使通信链�
 
 #### Fig 5 - 检测无线 AP 与 LAN 的连通性
 
+* 探测并发现接入 _LAN_ 的所有设备
 
+  * 包括 _IP_ 地址和 _MAC_ 地址
+  * 可以由 _Sniffer_ 使用一些软件实现
+    * 使用 _ICMP ping_ / _TCP SYN_ 扫描活跃的 _IP_ 地址
+    * 使用 _ARP_ 协议和 _IP_ 地址获取 _MAC_ 地址
+
+* 从所有设备集合中列出疑似 _NAT AP_ 的设备
+
+  多种测试方法：
+
+  * 广播 _IP_ 头部的 `TTL` 字段被设为 `1` 的包，并监听回应
+    * _NAT_ 设备会回应 _ICMP "Time Exceeded"_
+    * _host_ 设备和 _server_ 设备不会发送任何回应
+  * 向所有设备不常用的 _UDP_ 端口（> 61000）发送包，并监听回应
+    * _NAT_ 设备没有任何回应（端口映射不存在，直接丢弃包）
+    * 其余设备会回应 _ICMP "Destination Unreachable"_
+  * 向所有设备发送目的地不是自身 _IP_ 但 _MAC_ 地址是自身的数据包
+    * _NAT_ 设备会将包转发到正确的 _IP_ 地址
+    * 其余设备会把包直接丢弃
+  * _Sniffer_ 发送 _DHCP_ 请求，获取自身 _IP_ 和配置参数（网关路由器的 _IP_ 地址）
+    * 网关路由器通常都带有 _NAT_ 功能
+    * _AP_ 肯定不是网关路由器
+    * 用于排除一部分疑似 _AP_ 的 _NAT_ 设备
+  * _Sniffer_ 从无线链路上嗅探到一部分 _AP_ 的 _MAC_ 地址（无线网卡）
+    * 如果所有有线设备集合中的 _MAC_ 地址小范围浮动，包含该无线 _MAC_ 地址，那么该有线设备极有可能是 _NAT AP_
+    * _AP_ 生产厂商通常将 _AP_ 中的有线网卡与无线网卡的 _MAC_ 地址配置得很相近
+    * 部分 _AP_ 的有线网卡和无线网卡出自同一厂商（_MAC_ 地址前三字节）
+    * 只有已知的部分厂商提供 _AP_ 设备
+
+* 对疑似 _NAT AP_ 的设备使用 _ARP Poisoning_ （以免其它设备受干扰）
+
+  * _Sniffer_ 发送不合法的 _ARP reply_ - 关联疑似 _NAT AP_ 的 _IP_ 地址和 _Sniffer_ 的 _MAC_ 地址
+  * 将不合法的 _ARP reply_ 广播或单播到所有非疑似 _NAT AP_ 设备
+  * 这样一来，所有发送到疑似 _NAT AP_ 设备的包会先被送到 _Sniffer_
+
+* _Sniffer_ 捕获送往 _NAT AP_ 的数据包并记录
+
+  * 目标端口号 - 暗示 _NAT_ 设备中有效的端口映射
+
+* _Sniffer_ 将数据包转发到正确的 _MAC_ 地址
+
+* _Sniffer_ 使用记录的数据产生一个或多个 _marker packets_ 并发送给疑似 _NAT AP_ 设备
+
+  * _NAT AP_ 设备会根据端口映射将 _marker packets_ 传输到无线链路
+  * _marker packets_ 可以被特殊设计以免干扰正常通信
+    * 空的载荷
+    * _TCP_ 头部和载荷与早先捕获的包相同
+    * 错误的 _CRC_ 校验和
+  * _marker packets_ 符合特定格式，以便在无线链路中被识别
+
+* _Sniffer_ 监控无线链路，识别 _marker packets_
+
+  * 检查 _size_ / _content_ / _header value_ 等
+  * 判断早先被 _Sniffer_ 捕获的包是否出现在了无线链路上
+  * 如果出现，则发送该包的 _AP_ 被认为接入了 _LAN_
+
+* _Sniffer_ 测试连通性
+
+  * 周期性地像 _AP_ 的 _IP_ 地址发送 _ARP_ 请求
+  * 如果能够收到 _ARP_ 回应，则 _AP_ 与 _LAN_ 连通；否则不连通
+
+#### Fig 6 - 列出疑似 NAT AP 的方法
+
+* 向 _MAC_ 广播地址发送 `TTL` 设为 `1` 的包
+* 记录回应为 _ICMP "Time Exceeded"_ 报文的设备
+  * 记录 _IP_ 地址和 _MAC_ 地址
+  * 包含了网段中所有的 _NAT_ 和路由设备
+  * 令这个设备集合为 _S_
+* 向 _S_ 中的所有设备发送目标端口较大（> 60000）的 _UDP_ 包
+* 令没有回应 _ICMP "Destination Unreachable"_ 的设备集合为 _S1_
+  * _S1_ 包括连接到网段上的所有 _NAT_ 设备
+  * _NAT_ 设备因不满足端口映射而直接丢弃包，不会回应
+* 根据 _DHCP_ 信息，排除 _NAT_ 设备中的路由器
+  * 网关路由器一般提供 _NAT_ 功能，但不是 _AP_
+* 为对疑似 _AP_ 的 _ARP poisoning_ 进行优先级排列
+  * 使用无线链路中捕获的 _MAC_ 地址与有线设备的 _MAC_ 地址进行比较的方式
+
+#### Fig 7 - 通过无线链路数据包中的 _MAC_ 地址识别一个 _NAT AP_ 的方法
+
+本方法应在任何测试 _NAT AP_ 与 _LAN_ 连通性之前进行
+
+* 在无线链路中捕获一个选定 _AP_ 发送/接收的数据包
+* 记录数据包中的源/目标 _MAC_ 地址
+* 记录数据包中的 _BSSID_
+* 若 _MAC_ 地址与 _BSSID_ 不相等 - _AP_ 是一个 _Layer 2 bridge type AP_
+* 若 _MAC_ 地址与 _BSSID_ 相等 - _AP_ 很有可能是一个 _NAT AP_
+
+#### Fig 8 - Sniffer 的功能结构
+
+* _Handler_
+  * 使用以太网卡或无线网卡，拦截网段上的数据包
+* _Processor_
+  * 用于从拦截的数据包中获取信息
+  * 用于产生 _marker packets_
+* _Output handler_
+  * 用于向外发送数据包
+* _Wireless activity detector_
+  * 用于监控无线网络活动
+
+---
+
+### Summary
+
+目前正在开发中的 _WIDS_ 需要 __是否接入内网__ 的检测功能
+
+系统目前暂时通过 _kismet_ 从无线链路中捕获 _AP_ 信息
+
+考虑此篇文章中的方法是否可以用上
+
+如果需要用上
+
+则需要在有线网络的嗅探上做文章
+
+---
 
