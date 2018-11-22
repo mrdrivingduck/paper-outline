@@ -151,7 +151,7 @@ Nanjing, Jiangsu, China
 
 提出的度量方式：__动态__ 地使用 _RSS_ 向量中的 __部分__ 数值
 $$
-D_{p,q}^B = \sqrt{\frac{\sum_{b\in{BL}}(S_p(s_b)-S_q(S_b))^2}{B}}
+{D_{p,q}^B = \sqrt{\frac{\sum_{b\in{BL}}(S_p(s_b)-S_q(S_b))^2}{B}}}
 $$
 _B (B ≤ n)_ 指参与距离计算的 _RSS_ 值个数 - 体现了 __部分性__ - 如果 _B = n_，那么相当于欧氏距离
 
@@ -171,7 +171,7 @@ _BL_ 是指 `p` 向量和 `q` 向量 __分量相差最大__ 的前 _B_ 个分量
 
 考虑到集合中有一些 _RSS_ 向量重复多次，在计算聚类中心时需要考虑重复出现的次数
 $$
-S_{nu} = \arg\min_{{S_p}\in{C_1}}\sum_{{S_q}\in{C_1}}w_qD_{p,q}^B
+{S_{nu} = \arg\min_{{S_p}\in{C_1}}\sum_{{S_q}\in{C_1}}w_qD_{p,q}^B}
 $$
 含义：
 
