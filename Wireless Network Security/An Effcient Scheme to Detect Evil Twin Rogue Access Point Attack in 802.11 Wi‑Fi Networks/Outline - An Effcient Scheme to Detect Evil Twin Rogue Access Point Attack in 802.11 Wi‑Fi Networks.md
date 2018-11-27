@@ -62,7 +62,7 @@ _Evil Twin_ 必须向接入的客户端提供互联网连接
 
 * _client_ &rarr; _AP_ - _Authentication request_
 * _AP_ &rarr; _client_ - _Authentication response_
-  * _AP_ 的黑名单中有 _client_的 _MAC_ 地址 - 失败
+  * _AP_ 的黑名单中有 _client_ 的 _MAC_ 地址 - 失败
   * _AP_ 过载 - 失败
 * _client_ &rarr; _AP_ - _Association request_
 * _AP_ &rarr; _client_ - _Association response_
