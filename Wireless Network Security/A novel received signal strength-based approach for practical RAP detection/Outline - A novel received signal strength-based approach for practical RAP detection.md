@@ -1,6 +1,6 @@
 # Outline
 
-## A novel received signal strength–based approach for practical RAP detection
+## PRAPD - A novel received signal strength-based approach for practical rogue access point detection - IJDSN2017
 
 Created by : Mr Dk.
 

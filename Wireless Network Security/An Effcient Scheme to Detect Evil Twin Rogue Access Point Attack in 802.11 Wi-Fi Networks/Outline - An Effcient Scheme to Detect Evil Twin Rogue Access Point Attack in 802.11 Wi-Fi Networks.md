@@ -1,6 +1,6 @@
 # Outline
 
-## An Effcient Scheme to Detect Evil Twin Rogue Access Point Attack in 802.11 Wi‑Fi Networks
+## An Effcient Scheme to Detect Evil Twin Rogue Access Point Attack in 802.11 Wi-Fi Networks - IJWIN 2018
 
 Created by : Mr Dk.
 

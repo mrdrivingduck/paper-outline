@@ -1,6 +1,6 @@
 # Outline
 
-## Method and system for detecting wireless access devices operably coupled to computer local area networks and related methods
+## Method and system for detecting wireless access devices operably coupled to computer local area networks and related methods - United States Patent
 
 Created by : Mr Dk.
 
