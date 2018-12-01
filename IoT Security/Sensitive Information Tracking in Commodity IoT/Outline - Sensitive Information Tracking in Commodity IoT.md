@@ -170,3 +170,104 @@ _Event handler_ 不限于只实现 _action_，还可以实现应用逻辑、发�
 
 #### From Source Code to IR
 
+物联网应用的三大模块：
+
+* _Permissions_ - 用户安装或更新应用时被授予
+
+  * _Devices_
+  * _User inputs_
+
+  提取所有设备和用户输入的权限
+
+* _Events / Actions_ - 由于事件驱动的特性，物联网应用没有主函数，通过订阅时间隐式定义函数入口
+
+  通过分析应用如何订阅事件，构造 _IR_
+
+  * 设备使用的映射
+  * 被订阅的事件
+  * 被调用的 _event handler_
+
+* _Asynchronously Executing Events_ - 论文认为，所有事件按照接受顺序被处理
+
+* _Call Graphs_ - 为每一个程序入口创建一个调用图
+
+#### Static Taint Tracking
+
+##### Backward Taint Tracking
+
+* 从程序流程图的 _sinks_ 开始，反向寻找泄露路径
+  * _sinks_ 比 _sources_ 少，反向寻找开销较低
+* 剪掉不可行的泄露路径
+* 得到一个从 _source_ 到 _sink_ 的可行路径集合
+
+##### SmartThings Idiosyncrasies
+
+平台特殊性
+
+* _State variables_ 的追踪
+* _Call by Reflection_ - 使用字符串形式的函数名调用函数
+* _Web-service Applications_
+  * _Endpoints_
+  * _HTTP operations_
+  * _Callback method_
+* _Closures & Groovy-Specific Operations_
+
+##### Implicit Flows
+
+检测条件分支的条件值是否依赖于泄露值
+
+* 若依赖，则可以通过判断条件分支是否执行来推测出泄露值
+
+#### Implementation
+
+中间语言生成算法工作在 _Abstract Syntax Tree (AST)_ 上
+
+_SAINT_ 的输出：
+
+* 从 _source_ 到 _sink_ 的完整数据流路径
+* 敏感数据的标签
+* _sink_ 的信息（域名或 _URL_，和联系方式）
+
+### Application Study
+
+#### Data Flow Analysis
+
+#### Implicit Flows
+
+#### IoTBench
+
+### Limitations & Discussion
+
+### Related Work
+
+### Conclusions
+
+目前物联网存在的核心挑战是——应用使用数据的不可见性
+
+_SAINT_ 是一个新型的分析工具，能够在物联网应用中识别敏感数据流
+
+* 将物联网应用的源代码翻译为中间语言
+* 利用中间语言可以描绘应用的生命周期
+  * 程序入口点
+  * 用户输入
+  * _Events_
+  * _Actions_
+* 从 _source_ 到 _sink_ 追踪信息流
+
+使用了两种方式评估 _SAINT_：
+
+* _SmartThings_ 应用商店中大量 _app_ 的水平对比
+* 使用 _IoTBench_ 中的恶意应用评估
+
+证明了论文中方法的有效性
+
+---
+
+### Summary
+
+看不太懂 没有多少概念
+
+就当看着玩玩吧。。。。。。
+
+---
+
