@@ -1,6 +1,6 @@
 # Outline
 
-## Sensitive Information Tracking in Commodity IoT - 27th USENIX
+## Sensitive Information Tracking in Commodity IoT - Usenix Security 2018
 
 Created by : Mr Dk.
 
