@@ -20,8 +20,6 @@ Nanjing, Jiangsu, China
 
 同时，_PeerKey handshake_、_GroupKey handshake_、_The Fast BSS Transition handshake_ 等握手方式也有类似的问题
 
----
-
 ### Background
 
 四次握手的基本原理已经详细记录在 _notes_ 中
@@ -33,8 +31,6 @@ _KRACK_ 的基本原理是迫使客户端重新安装现有的 _PTK_
 从而使计数器的值重现，加密数据帧的密钥流也重现了
 
 使用重复的密钥流，数据包可以被解密、伪造等
-
----
 
 ### Attacking The 4-way Handshake
 
