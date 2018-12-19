@@ -1,6 +1,6 @@
 # Outline
 
-## FBS-Radar: Uncovering Fake Base Stations at Scale in the WildT - NDSS 2017
+## FBS-Radar: Uncovering Fake Base Stations at Scale in the Wild - NDSS 2017
 
 Created by : Mr Dk.
 
