@@ -109,7 +109,7 @@ _FBS-Radar_ - 集成在百度手机卫士中，目标：
 
 #### Other Related Work
 
-在可扩展性和通用性方面不如 _FSB-Radar_
+在可扩展性和通用性方面不如 _FBS-Radar_
 
 ---
 
