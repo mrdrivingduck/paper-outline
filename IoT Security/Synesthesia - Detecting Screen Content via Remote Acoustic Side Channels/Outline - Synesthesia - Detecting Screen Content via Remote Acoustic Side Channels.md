@@ -843,7 +843,7 @@ Amazing MP3 Recorder app - `start recording` & `stop recording` interface
 
 ---
 
-### Conclusion
+## Conclusion
 
 报告了新型的物理侧信道 - 屏幕显示内容的声学泄露
 
