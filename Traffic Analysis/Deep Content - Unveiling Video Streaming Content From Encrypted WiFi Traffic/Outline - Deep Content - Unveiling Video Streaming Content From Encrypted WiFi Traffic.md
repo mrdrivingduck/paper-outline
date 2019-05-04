@@ -1,6 +1,6 @@
 # Outline
 
-## Deep Content - Unveiling Video Streaming Content From Encrypted Wi-Fi Traffic -  NCA 2018
+## Deep Content: Unveiling Video Streaming Content From Encrypted Wi-Fi Traffic -  NCA 2018
 
 Created by : Mr Dk.
 

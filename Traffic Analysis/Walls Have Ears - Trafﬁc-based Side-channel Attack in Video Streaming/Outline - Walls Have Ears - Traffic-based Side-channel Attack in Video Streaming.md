@@ -1,6 +1,6 @@
 # Outline
 
-## Walls Have Ears - Trafﬁc-based Side-channel Attack in Video Streaming -  INFOCOM 2018
+## Walls Have Ears: Trafﬁc-based Side-channel Attack in Video Streaming -  INFOCOM 2018
 
 Created by : Mr Dk.
 

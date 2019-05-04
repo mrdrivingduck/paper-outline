@@ -1,6 +1,6 @@
 # Outline
 
-## Rogue Access Point Detection - Taxonomy, Challenges, and Future Directions - WPC 2016
+## Rogue Access Point Detection: Taxonomy, Challenges, and Future Directions - WPC 2016
 
 Created by : Mr Dk.
 

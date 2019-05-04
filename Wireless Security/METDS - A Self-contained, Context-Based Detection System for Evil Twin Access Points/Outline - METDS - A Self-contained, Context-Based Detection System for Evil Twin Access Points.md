@@ -1,6 +1,6 @@
 # Outline
 
-## METDS - A Self-contained, Context-Based Detection System for Evil Twin Access Points - Financial Cryptography 2015
+## METDS: A Self-contained, Context-Based Detection System for Evil Twin Access Points - Financial Cryptography 2015
 
 Created by : Mr Dk.
 

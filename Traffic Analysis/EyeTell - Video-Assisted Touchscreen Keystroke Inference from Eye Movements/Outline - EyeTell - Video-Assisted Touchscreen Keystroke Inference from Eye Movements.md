@@ -1,6 +1,6 @@
 # Outline
 
-## EyeTell - Video-Assisted Touchscreen Keystroke Inference from Eye Movements - IEEE S&P 2018
+## EyeTell: Video-Assisted Touchscreen Keystroke Inference from Eye Movements - IEEE S&P 2018
 
 Created by : Mr Dk.
 

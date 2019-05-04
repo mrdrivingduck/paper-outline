@@ -1,6 +1,6 @@
 # Outline
 
-## WADAC - Privacy-Preserving Anomaly Detection and Attack Classification on Wireless Traffic - WISEC 2018
+## WADAC: Privacy-Preserving Anomaly Detection and Attack Classification on Wireless Traffic - WISEC 2018
 
 Created by : Mr Dk.
 

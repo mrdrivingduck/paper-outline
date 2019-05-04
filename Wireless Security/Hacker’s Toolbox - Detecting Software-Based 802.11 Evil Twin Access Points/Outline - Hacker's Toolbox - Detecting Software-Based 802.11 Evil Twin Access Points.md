@@ -1,6 +1,6 @@
 # Outline
 
-## Hacker's Toolbox - Detecting Software-Based 802.11 Evil Twin Access Points - CCNC 2015
+## Hacker's Toolbox: Detecting Software-Based 802.11 Evil Twin Access Points - CCNC 2015
 
 Created by : Mr Dk.
 

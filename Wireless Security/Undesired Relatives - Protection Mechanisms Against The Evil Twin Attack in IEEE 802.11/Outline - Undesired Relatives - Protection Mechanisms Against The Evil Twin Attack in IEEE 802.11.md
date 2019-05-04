@@ -1,6 +1,6 @@
 # Outline
 
-## Undesired Relatives - Protection Mechanisms Against The Evil Twin Attack in IEEE 802.11 - Q2SWinet 2014
+## Undesired Relatives: Protection Mechanisms Against The Evil Twin Attack in IEEE 802.11 - Q2SWinet 2014
 
 Created by : Mr Dk.
 

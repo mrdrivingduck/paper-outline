@@ -1,6 +1,6 @@
 # Outline
 
-## PatternListener - Cracking Android Pattern Lock Using Acoustic Signals -  CCS 2018
+## PatternListener: Cracking Android Pattern Lock Using Acoustic Signals -  CCS 2018
 
 Created by : Mr Dk.
 

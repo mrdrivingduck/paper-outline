@@ -1,6 +1,6 @@
 # Outline
 
-## Synesthesia - Detecting Screen Content via Remote Acoustic Side Channels - S&P 2019
+## Synesthesia: Detecting Screen Content via Remote Acoustic Side Channels - S&P 2019
 
 Created by : Mr Dk.
 

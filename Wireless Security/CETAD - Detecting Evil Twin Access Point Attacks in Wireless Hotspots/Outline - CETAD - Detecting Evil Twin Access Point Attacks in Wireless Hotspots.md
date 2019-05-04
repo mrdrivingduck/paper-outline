@@ -1,6 +1,6 @@
 # Outline
 
-## CETAD - Detecting Evil Twin Access Point Attacks in Wireless Hotspots - CNS 2014
+## CETAD: Detecting Evil Twin Access Point Attacks in Wireless Hotspots - CNS 2014
 
 Created by : Mr Dk.
 

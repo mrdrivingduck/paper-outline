@@ -1,6 +1,6 @@
 # Outline
 
-## Host-Based Intrusion Detection for VANETs - A Statistical Approach to Rogue Node Detection - IEEE Trans. Vehicular Technology 2016
+## Host-Based Intrusion Detection for VANETs: A Statistical Approach to Rogue Node Detection - IEEE Trans. Vehicular Technology 2016
 
 Created by : Mr Dk.
 

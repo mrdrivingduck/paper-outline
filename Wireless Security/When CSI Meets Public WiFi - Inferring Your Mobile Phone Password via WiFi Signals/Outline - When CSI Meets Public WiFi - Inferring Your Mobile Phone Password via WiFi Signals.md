@@ -1,6 +1,6 @@
 # Outline
 
-## When CSI Meets Public Wi-Fi - Inferring Your Mobile Phone Password via Wi-Fi Signals - CCS 2016
+## When CSI Meets Public Wi-Fi: Inferring Your Mobile Phone Password via Wi-Fi Signals - CCS 2016
 
 Created by : Mr Dk.
 

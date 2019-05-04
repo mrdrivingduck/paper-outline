@@ -1,6 +1,6 @@
 # Outline
 
-## Wi Not Calling - Practical Privacy and Availability Attacks in Wi-Fi Calling - ACSAC 2018
+## Wi Not Calling: Practical Privacy and Availability Attacks in Wi-Fi Calling - ACSAC 2018
 
 Created by : Mr Dk.
 

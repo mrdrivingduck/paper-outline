@@ -1,6 +1,6 @@
 # Outline
 
-## Key Reinstallation Attacks - Forcing Nonce Reuse in WPA2 - CCS 2017
+## Key Reinstallation Attacks: Forcing Nonce Reuse in WPA2 - CCS 2017
 
 Created by : Mr Dk.
 
