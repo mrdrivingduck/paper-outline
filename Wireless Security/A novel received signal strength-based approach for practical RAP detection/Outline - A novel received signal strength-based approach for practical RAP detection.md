@@ -170,9 +170,9 @@ _BL_ 是指 `p` 向量和 `q` 向量 __分量相差最大__ 的前 _B_ 个分量
 ##### 聚类中心计算
 
 考虑到集合中有一些 _RSS_ 向量重复多次，在计算聚类中心时需要考虑重复出现的次数
-$$
-{S_{nu} = \arg\min_{{S_p}\in{C_1}}\sum_{{S_q}\in{C_1}}w_qD_{p,q}^B}
-$$
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= {S_{nu} = \arg\min_{{S_p}\in{C_1}}\sum_{{S_q}\in{C_1}}w_qD_{p,q}^B}" style="border:none;">
+
 含义：
 
 存在一个向量 `p`，使其它所有向量 `q` 到 `p` 的距离 × `q` 的重复次数之和最小
