@@ -150,9 +150,9 @@ Nanjing, Jiangsu, China
 传统的 __欧氏距离__ 考虑了所有维度，可能会因为 __缺失值__ 而产生较大偏差
 
 提出的度量方式：__动态__ 地使用 _RSS_ 向量中的 __部分__ 数值
-$$
-{D_{p,q}^B = \sqrt{\frac{\sum_{b\in{BL}}(S_p(s_b)-S_q(S_b))^2}{B}}}
-$$
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= {D_{p,q}^B = \sqrt{\frac{\sum_{b\in{BL}}(S_p(s_b)-S_q(S_b))^2}{B}}}" style="border:none;">
+
 _B (B ≤ n)_ 指参与距离计算的 _RSS_ 值个数 - 体现了 __部分性__ - 如果 _B = n_，那么相当于欧氏距离
 
 _BL_ 是指 `p` 向量和 `q` 向量 __分量相差最大__ 的前 _B_ 个分量
