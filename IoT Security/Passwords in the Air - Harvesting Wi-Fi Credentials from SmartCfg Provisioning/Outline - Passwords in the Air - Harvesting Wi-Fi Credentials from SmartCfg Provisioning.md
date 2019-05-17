@@ -1,6 +1,6 @@
 # Outline
 
-## Passwords in the Air: Harvesting Wi-Fi Credentials from SmartCfg Provisioning -  WISEC 2018
+## Passwords in the Air: Harvesting Wi-Fi Credentials from SmartCfg Provisioning - WISEC 2018
 
 Created by : Mr Dk.
 
