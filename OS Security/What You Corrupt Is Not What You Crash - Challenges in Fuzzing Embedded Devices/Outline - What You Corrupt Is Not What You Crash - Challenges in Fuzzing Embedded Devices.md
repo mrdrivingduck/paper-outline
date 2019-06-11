@@ -4,7 +4,7 @@
 
 Created by : Mr Dk.
 
-2019 / 06 / 11 13:40
+2019 / 06 / 11 15:47
 
 Nanjing, Jiangsu, China
 
@@ -724,6 +724,122 @@ Avatar 保存并重放设备初始化之后的状态
 ---
 
 ## Experiments
+
+在局部仿真和完全仿真的场景中进行实验
+
+目标：将这些思路集成到实时 fuzzing 实验中
+
+提供错误检测机制
+
+缓和嵌入式操作系统中缺乏对应机制的问题
+
+然而，这样方式将不可避免带来一些性能上的开销
+
+### Target Setup
+
+为一款 Type-III 的设备编译了 _expat_ 应用
+
+使用了四种配置进行 fuzzing
+
+* NAT: Native
+  * Fuzzing 直接在实际设备上进行
+  * 没有任何错误检测机制
+  * 作为 baseline
+* PE/MF: Partial Emulation with Memory Forwarding
+  * 固件被仿真
+  * 访问外围设备通过转发 I/O 内存访问到实际设备实现
+* PE/PM: Partial Emulation with Peripheral Modeling
+  * 固件被仿真
+  * 使用 Avatar 内的专用脚本模仿外围设备
+  * 不需要物理外围设备
+* FE: Full Emulation
+  * 固件和外围设备在 PANDA 中完全仿真
+
+使用了设备初始化结束后的快照
+
+输入受威胁软件的数据通过一个简单的文本协议经过串口连接输入
+
+### Fuzzer Setup
+
+_boofuzz_ - 一款流行的 Python fuzzing 框架
+
+* 生成并发送恶意输入
+* 定义目标监控
+* hooks
+
+Fuzz over user-defined communication channels
+
+实现了串口通信和 TCP 通信
+
+显然，触发错误的输入肯定会占用更大的开销
+
+强制使 fuzzer 在一定的概率下产生会触发错误的输入
+
+* 0 / 0.01 / 0.05 / 0.1
+
+增加了一个简单的 liveness check
+
+* 在每次 fuzz 输入后，fuzzer 接收到设备的回应，并判断是否与期待的输出匹配
+
+当接收到的回应与期待的值不同 或 连接超时
+
+fuzzer 报告一个 crash，并重启设备
+
+* fuzzer 通过 _boofuzz_ 来重启物理设备或仿真器
+
+#### False Positives and False Negatives
+
+目标是展示嵌入式设备在错误检测中的局限
+
+和使用启发式的方法克服这个问题的可行性
+
+而不是评估某个特定实现的效果
+
+#### Fault Detection
+
+在没有任何保护机制的条件下 fuzzing 是低效的
+
+单纯使用 liveness check 只能够检测：
+
+* stack-based buffer overflow
+* format string vulnerability
+
+因为这两个 bug 会导致设备未响应，从而导致超时
+
+其它类型的 bug，虽然成功触发了内存损坏，但无法被 fuzzer 探测到
+
+实验表明，六个启发的组合能够检测出所有的内存损坏
+
+#### Performance
+
+在不同的触发概率下
+
+在一小时的 fuzz 会话中
+
+目标可以处理的输入数量
+
+PE/MF 的速度慢了一个量级 - 这是由于固件和外围设备的通信造成的
+
+使用了启发对 PE/MF 的开销几乎没有影响
+
+* 因为瓶颈位于转发 MMIO 的请求
+
+然而，对于 PE/PM 和 FE 来说，启发带来的开销显而易见
+
+完全仿真的速度比真实设备快，只要触发内存损坏的概率较低
+
+主要原因有三个：
+
+* TCP 的吞吐率比串行接口高
+* 虽然固件被仿真，但仿真的时钟速率比低端专用设备高
+* 检测到内存损坏伴随着强制重启，更高的触发比例意味着大量的重启时间
+
+最重要的结果是，执行在 PANDA 中的固件，执行组合启发式算法后
+
+在低于实际触发概率下，比真实的嵌入式设备运行快
+
+* 前者能检测出所有的威胁
+* 后者只能检测出两种
 
 ---
 
