@@ -4,7 +4,7 @@
 
 Created by : Mr Dk.
 
-2019 / 07 / 20 10:51
+2019 / 07 / 21 13:40
 
 Nanjing, Jiangsu, China
 
@@ -490,4 +490,416 @@ JANUS 创建新的实例来测试每个新产生的映像和程序
 ---
 
 ## Implementation
+
+将 JANUS 实现为 AFL 的变种
+
+利用了 AFL 的基本结构，包括：
+
+* forkserver
+* coverage bitmap
+* test-case scheduling algorithm
+
+在 AFL 上扩展了 image mutator 和 syscall fuzzer
+
+还实现了 image inspector 建立 seed 映像的初始语料库
+
+Program serializer - 在内存和语料库之间传递产生的程序
+
+基于 Linux Kernel Library (LKL) 实现了 executor
+
+修改 LKL，使其支持 kernel address sanitizer (KASAN)
+
+为了便于重现 bug，实现了一套 Proof-of-Concept (PoC) generator
+
+* 从测试样例中产生一个 full-size 映像和一个可编译的 C 程序
+
+### Image Parser and Image Mutator
+
+将 Image Parser 实现为动态库
+
+* 定位 metadata，识别 checksum
+* 支持 Linux 上 8 种广泛使用的文件系统
+* 引用了用户空间工具 - `mkfs`、`fsck`
+
+Image Mutator 被用于随机突变映像的 metadata 部分
+
+* 八种策略 - 直接从 AFL 中移植
+
+### Image Inspector
+
+对 seed 映像上的文件和路径进行迭代
+
+并记录它们的映像内路径、类型、扩展名
+
+用于产生初始的测试用例
+
+### Program Serializer
+
+将新产生的程序和更新后的状态
+
+* 从内存中保存到磁盘上
+* 从磁盘上读取出来用于 fuzzing
+
+### System Call Fuzzer
+
+Syscall fuzzer 被实现为 AFL 的新的扩展
+
+在 JANUS 的 image mutation 没有进展时被调用
+
+Syscall fuzzer 接收一个程序和对应的映像状态
+
+通过 syscall mutation 和 syscall generation
+
+并输出新的程序和更新后的状态
+
+有一些与文件操作相关但主要实现在 VFS 中的系统调用被忽略
+
+* `dup()`、`splice()`、`tee()`、...
+
+在本文的实现中，JANUS 突变 metadata 256 轮
+
+如果 code average 没有增加
+
+JANUS 试着突变已有的系统调用 128 轮
+
+并加入新的系统调用再循环 64 轮
+
+### LKL-based Executor
+
+在 library OS - Linux Kernel Library 上实现了 executor
+
+* LKL 向用户空间程序暴露了内核接口
+
+实现了用户空间应用，与 LKL 链接，作为 fuzzing 目标
+
+对于一个测试用例，executor 通过 forkserver fork 新的实例
+
+并调用 LKL 系统调用，挂载突变后的映像
+
+然后开始执行生成的程序中的文件操作
+
+由于每次将 full-size 的映像写入磁盘需要很长时间
+
+本文实现中，引入了一块永久的内存缓冲区
+
+由 JANUS 的 fuzzing 引擎和 LKL executor 共享
+
+用于存放 image
+
+LKL 的块设备驱动需要被修改
+
+访问内存中的 buffer，而不是磁盘上的映像文件
+
+此外，在运行时还使用了 Copy-on-Write (CoW) 技术
+
+保证除了突变过的块，映像 buffer 上的其它部分不会被产生的程序修改
+
+当设备驱动在运行时想要修改映像上的 block 时
+
+Block 被复制用于修改，并在之后被 LKL 访问
+
+在 LKL 中还集成了 KASAN，用于检测运行时的内存错误
+
+KASAN 会在运行时分配 shadow memory
+
+记录原内存的每一个字节是否可以被安全地访问
+
+* 由于 KASAN 依赖于 MMU，而 LKL 不支持
+* 在 LKL 启动时为 LKL 的内存空间和 shadow memory 建立映射
+
+---
+
+## Evaluation
+
+* Q1: JANUS 发现之前未知的文件系统漏洞有多有效？
+* Q2: JANUS 搜索文件系统映像、文件操作和两者结合的效率如何？
+* Q3: 基于 library OS 的 executor 是否比 VM 重现 bug 的效率更高？
+* Q4: 除了发现新 bug，JANUS 还可以为文件系统社区贡献什么？
+
+### Experimental Setup
+
+为每一种文件系统创建一个 seed 映像
+
+* 上面包含各类文件对象 (文件、目录、链接等)
+
+其中，对于 ext4，创建了两个 seed 映像：
+
+* 一个与 ext2/3 兼容
+* 一个带有 ext4 的特性
+
+类似地，对于 XFS v4 和 XFS v5，其中后者引入了 checksum，保证了 metadata 的完整性
+
+由于 Syzkaller 依赖于 KCOV 来获得代码覆盖，而 JANUS 依赖 AFL
+
+为了公平比较，在 fuzzing 12h 后，依次挂载 JANUS 突变的每一个映像
+
+并在一个开启了 KCOV 的内核上运行每一个程序，获得 KCOV 风格的代码覆盖
+
+#### A. Bug Discovery in the Upstream File System
+
+大部分的 bug 的重现需要：
+
+* 挂载一个损坏的映像
+* 紧接着进行特定的文件操作
+
+是 JANUS 的二维输入共同触发的
+
+有四分之一的 bug 是在挂载一个损坏的映像后触发的
+
+体现了 JANUS 对 image 进行 fuzzing 的有效性
+
+总体上，JANUS 成功发现了 90 个 bug，其中 62 个是之前未知的
+
+#### B. Exploring the State Space of Images
+
+Syzkaller 已经支持挂载一个修改后的 image - `syz_mount_image()`
+
+* 接收一个映像突变后的非 0 段作为输入
+* 并这些块放入对应的映像偏移中
+* 最终调用 `mount()` 挂载
+
+在一个突变后的映像挂载之后
+
+* LKL-based executor
+* Syzkaller
+
+执行一个固定序列的系统调用
+
+对比哪个 fuzzer 对 image 的突变效果更好
+
+JANUS 总是有更高的代码覆盖率 - `1.47-4.17×` Syzkaller
+
+* Syzkaller 只考虑了映像中的非 0 部分
+  * 即可能丢失 metadata 块
+  * 也可能包含无关的 data 块
+* JANUS 利用了映像的语义，只定位和修改 metadata blocks
+
+此外，对于 GFS2 和 Btrfs，具有针对 metadata 的校验和，严重影响了 Syzkaller 的表现
+
+Syzkaller 也不支持具有超过 4096 个不连续的非 0 块的 image
+
+总体上看，对于只突变映像，JANUS 具有更高的效果
+
+#### C. Exploring File Operations
+
+比较 JANUS 和 Syzkaller 对于 fuzzing 27 个文件系统相关的系统调用的效果
+
+只 fuzzing 文件操作，不修改文件系统映像
+
+对于 Syzkaller 的程序生成，在系统调用描述文件中对文件路径进行硬编码
+
+对于 XFS v5、Btrfs、ext4 文件系统
+
+JANUS 的代码覆盖分别是 Syzkaller 的 `2.24×`、`1.27×`、`1.25×`
+
+通过产生上下文相关的程序，JANUS 能够比 Syzkaller 更有效地 fuzzing
+
+Syzkaller 无法获得文件系统的具体信息
+
+#### D. Exploring Two-Dimensional Input Space
+
+比较突变映像和突变程序结合时的效果
+
+在 Syzkaller 的描述文件中引入 `syz_mount_image()`
+
+使其不仅产生系统调用，还会对映像进行突变
+
+JANUS 在两者结合的 fuzzing 条件下，比单独 fuzzing 映像或系统调用效果都要好
+
+Syzkaller 对于两者的调度，优先先对 syscall 进行突变
+
+* 比如，在进行文件操作之前，Syzkaller 不会保证挂载的文件系统是否合法
+* 完全丢失了文件系统的上下文信息
+
+而 JANUS 会分别对每个映像使用状态干净的 LKL 实例进行测试
+
+如果挂载一个突变后的映像成功
+
+那么 executor 将会执行上下文相关的程序
+
+并在结束时调用 `umount()`
+
+#### E. Reproducing Crashes
+
+使用 PoC generator 产生了映像和对应的系统调用序列
+
+将映像挂载，并执行对应的系统调用，查看 kernel 是否崩溃
+
+Syzkaller 会将 crash 记录在日志中
+
+但由于使用了老化的 OS，无法重现任何的 bug
+
+相反的是，JANUS 能够重现 95% 的 bug，除了 Btrfs 文件系统
+
+* 因此 Btrfs 启动多个内核线程并行完成不同的事务，导致了不确定的执行顺序
+* F2FS 和 GFS2 也使用多线程来完成特定的工作，比如 GC，日志等
+* 如果能够控制线程调度，理论上可以重现 100% 的 bug
+
+本文还对比了基于 VM 的 fuzzer 刷新内核状态的开销
+
+* KVM 实例重启 VM 或从 snapshot 恢复的总时间
+
+并与 LKL executor 进行对比
+
+由于 LKL 实例调用 `fork()` 并启动一个新的 LKL 实例
+
+基于 LKL 的实例几乎占用了可以忽略的时间，重新设置了一个干净的 OS 和 FS 状态
+
+#### F. Miscellany
+
+部分文件系统社区使用 JANUS 产生的一些损坏的映像作为测试用例
+
+用于未来的回归测试
+
+F2FS 开发者不仅修复了内核模块中的漏洞
+
+还增强了对应的用户空间工具 - `fsck.f2fs`
+
+* 使用户能够在挂载前，提前检测到映像损坏
+
+---
+
+## Discussion
+
+### Library OS based Executor
+
+JANUS 依赖于 LKL 测试内核文件系统
+
+事实上，其它内核子模块也可以使用 LKL 进行测试
+
+* 除了需要 MMU 的组件
+
+此外，Oracle 的内核 fuzzer - User-Mode Linux (UML) 也有类似功能
+
+但由于其多进程的设计，增加了发现 crash 的复杂性
+
+### Minimal PoC Generator
+
+一个理想化的 PoC 应当只包含错误发生处的字节
+
+和一个有着最少文件描述符的程序
+
+JANUS 目前使用了暴力的方式：
+
+* 恢复每一个突变后的字节
+* 移除每一个引用的文件描述符
+* 检测内核是否依旧在预想位置 crash
+
+### Fuzzing FUSE Drivers
+
+目前，JANUS 不支持依赖于 FUSE (Filesystem in User space) 的文件系统
+
+* 只要它们将用户数据存储在磁盘映像中
+* 支持对应的文件操作，使用户能够访问
+
+JANUS 就可以支持这些文件系统
+
+### Fuzzing File System Utilities
+
+开发者严重依赖于系统工具 - `mkfs` / `fsck` 等，管理文件系统
+
+比如，Linux 自动启动 `fsck` 来恢复磁盘数据
+
+因此，开发者希望，这些工具中是没有 bug 的
+
+开发者能够轻易扩展 JANUS 的 image mutator
+
+产生损坏的映像，用于 fuzzing 这些工具
+
+本文作者使用 JANUS 已经找到了 `fsck.ext4` 中的两个未知的 bug
+
+### Extending to Fuzz File Systems on Other OSes
+
+如果对应系统的 library OS 解决方案存在
+
+那么将 JANUS 扩展到这样的系统上是直截了当的
+
+### Improving Other File System Testing Tools
+
+其它工具需要文件操作序列来进行其它方面的检测
+
+JANUS 可以为其提供一站式的解决方案
+
+---
+
+## Related Work
+
+### Structured Input Fuzzing
+
+对于 fuzzing 的输入 - 高度结构化 - 比如文件系统映像
+
+一些 fuzzer 基于人工描述的输入规格，产生语法上正确的输入
+
+一些基于突变的 fuzzer 通过修改一些合法样本来产生新的输入
+
+* 新的输入拥有正确的结构，带有一些小的错误，并希望能够触发 bug
+
+### OS Kernel Fuzzers
+
+这类 fuzzer 基于预定义的语法规则，产生随机的系统调用
+
+在对于文件系统的 fuzzing 中很低效
+
+而 JANUS 能够产生质量较高的程序
+
+### File System Semantic Correctness Checkers
+
+一些 checker 用于分析一个文件系统的实现是否遵循标准
+
+* 通过静态分析或文件系统行为的高层建模
+
+### File System Abstraction
+
+一些研究提出，通过高层抽象的统一接口访问或修改磁盘上的 metadata
+
+通过这些接口，JANUS 能够用一种增加通用的方式压缩磁盘映像
+
+而不是为每一个目标文件系统实现 image parser
+
+---
+
+## Conclusion
+
+在二维的输入空间中对文件系统进行 fuzzing
+
+* 有效突变了输入映像中的 metadata 部分
+* 执行上下文相关的系统调用程序
+* 依赖于 library OS 快速装载 OS 功能状态，避免了不稳定执行和不可重现的 bug
+
+总共报告了最新内核中的 90 个 bug
+
+* 43 个已经被修复；其中 32 个被分配了 CVE
+
+JANUS 的表现超过了 Syzkaller：
+
+* 最大 `4.19×` 倍的代码覆盖率
+* 能够重现 `88-100%` 的 crashes
+
+被几个文件系统开发团队用于一站式的文件系统测试方案
+
+也可以作为一些新的文件系统 checker 的基础设施
+
+---
+
+## Summary
+
+第一次看文件系统相关 对于文件系统的内部实现
+
+尤其是论文中 metadata 这一块儿还不太懂
+
+据我了解，文件系统内部的 inode 是一级一级找下去的
+
+如果把这些 metadata 打乱了，这些文件还能被找到吗。。。
+
+如果找不到，接下来的文件操作如何进行？
+
+此外，多亏上周了解了一下 Syzkaller
+
+相关的描述看得明白多了
+
+目前就是不知道关于 AFL 的一些细节
+
+有空可以再了解了解
+
+---
 
