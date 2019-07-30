@@ -12,7 +12,7 @@ Nanjing, Jiangsu, China
 
 ### Introduction
 
-无线传感器网络（_Wireless Sensor Networks, WSN_）由多个共同工作的微型的传感器结点组成
+无线传感器网络 ( _Wireless Sensor Networks, WSN_ ) 由多个共同工作的微型的传感器结点组成
 
 用于监控和采集感兴趣的数据
 
