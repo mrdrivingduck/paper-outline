@@ -1,16 +1,12 @@
 # Outline
 
-## DIFUZE - Interface Aware Fuzzing for Kernel Drivers - CCS 2017
+## DIFUZE: Interface Aware Fuzzing for Kernel Drivers - CCS 2017
 
 Created by : Mr Dk.
 
 2019 / 08 / 05 15:59
 
 Nanjing, Jiangsu, China
-
----
-
-[TOC]
 
 ---
 
