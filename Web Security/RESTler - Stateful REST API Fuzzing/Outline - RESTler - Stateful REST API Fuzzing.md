@@ -98,40 +98,40 @@ API 中可以包含很多种 __请求类型__，即 request type:
 
 ```json
 {
-    "basePath": "/api",
-    "swagger": "2.0",
-    "definitions": {
-        "Blog Post": {
-            "properties": {
-                "body": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                }
-            },
-            "required": [
-                "body"
-            ],
-            "type": "object"
+  "basePath": "/api",
+  "swagger": "2.0",
+  "definitions": {
+    "Blog Post": {
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
         }
-    },
-    "paths": {
-        "/blog/posts": {
-            "post": {
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "payload",
-                        "required": true
-                    }
-                ],
-                "schema": {
-                    "ref": "/definitions/Blog Post"
-                }
-            }
-        }
+      },
+      "required": [
+        "body"
+      ],
+      "type": "object"
     }
+  },
+  "paths": {
+    "/blog/posts": {
+      "post": {
+        "parameters": [
+          {
+            "in": "body",
+            "name": "payload",
+            "required": true
+          }
+        ],
+        "schema": {
+          "ref": "/definitions/Blog Post"
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -197,7 +197,7 @@ request = requests.Request(
 
 ## Test Generation Algorithm
 
-![algorithm](../../img/restler-algorithm.png)
+<img src="../../img/restler-algorithm.png" alt="algorithm" style="zoom: 67%;" />
 
 从 Line-3 开始：
 
@@ -232,7 +232,7 @@ EXTEND 负责将长度为 `n-1` 的请求序列扩展为长度为 `n` 的序列
 
 * 通过在每个序列的最后，追加符合依赖条件的每个请求
 
-因此，输入为上一轮迭代的请求序列集合 `seqSet`，和所有的请求 `reqSet` - 
+因此，输入为上一轮迭代的请求序列集合 `seqSet`，和所有的请求 `reqSet` :
 
 ```python
 def EXTEND(seqSet, reqSet):
@@ -466,7 +466,7 @@ GitLab 的后端使用 376K 行 Ruby 代码，具体配置略
 
 使用 GitLab 来测试更长的请求序列是否意味着更深的服务逻辑
 
-![restler-gitlab](../../img/restler-gitlab.png)
+<img src="../../img/restler-gitlab.png" alt="restler-gitlab" style="zoom: 50%;" />
 
 六组 API，BFS 搜索策略，五小时 fuzzing 时间，每个请求最多 1000 种组合
 
