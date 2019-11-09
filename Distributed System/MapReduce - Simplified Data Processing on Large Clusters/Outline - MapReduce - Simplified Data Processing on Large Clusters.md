@@ -124,7 +124,7 @@ reduce (k2, list(v2))  ->  list(v2)
 
 ## 3. Implementation
 
-Mapreduce 接口可以有不同的实现
+MapReduce 接口可以有不同的实现
 
 Google 的实现环境：
 
@@ -134,7 +134,7 @@ Google 的实现环境：
 * 分布式文件系统用于管理磁盘上的数据
 * 用户向一个调度系统提交作业，每个作业包含多个任务，任务被调度器分配到可用机器上
 
-### 3.1 Execuation Overview
+### 3.1 Execution Overview
 
 集群自动将输入数据切分为 M 块
 
@@ -162,11 +162,13 @@ Google 的实现环境：
 7. 当所有 map 和 reduce 任务结束后，master 唤醒用户程序
     * 返回用户代码
 
-在执行完毕后，mapreduce 的结果位于 R 个输出文件中
+在执行完毕后，MapReduce 的结果位于 R 个输出文件中
 
 用于可能不需要将 R 的结果合并到一个文件中
 
-因为它们可能是另一个 mapreduce 任务的输入
+因为它们可能是另一个 MapReduce 任务的输入
+
+<img src="../../img/map-reduce.png" alt="map-reduce"  />
 
 ### 3.2 Master Data Structures
 
@@ -183,7 +185,7 @@ Master 通过中间文件的位置，联系 map 任务和 reduce 任务
 
 ### 3.3 Fault Tolerance
 
-Mapreduce 库必须优雅地忍受结点错误
+MapReduce 库必须优雅地忍受结点错误
 
 #### Worker Failure
 
