@@ -71,7 +71,7 @@ Nanjing, Jiangsu, China
 * 汇编器
 * 数据库
 * 语法分析器
-* SMT 结算程序
+* SMT 解算程序
 
 ---
 
