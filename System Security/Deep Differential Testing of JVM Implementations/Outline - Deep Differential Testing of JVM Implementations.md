@@ -4,11 +4,33 @@
 
 Created by : Mr Dk.
 
-2020 / 02 / 08 21:00
+2020 / 02 / 08 21:11
 
 Ningbo, Zhejiang, China
 
 ---
+
+## Summary
+
+本文基于作者三年前的工作 [Coverage-Directed Differential Testing of JVM Implementations](https://mrdrivingduck.github.io/#/markdown?repo=paper_outline&path=System%20Security%2FCoverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations%2FOutline%20-%20Coverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations.md) 继续进行
+
+之前的工作只能测试 JVM 的启动阶段 (类加载、链接、初始化)
+
+但是 JVM 内部还有很多其它模块可以被测试
+
+本文的目标是能够进一步测试 JVM 的字节码验证模块和 JVM 的执行引擎
+
+当然，为了使产生的字节码能够进入 JVM 的这两个阶段
+
+产生字节码的方式肯定要比之前工作的工作更为严格
+
+之前工作中，产生的字节码只需要保证能被 JVM 加载、链接、初始化就可以了
+
+而本文中产生的字节码不仅需要能够通过上述这三个步骤
+
+还要能够经过字节码验证模块的验证，并交给执行引擎进行执行
+
+可能是由于本文发现了 _J9_ JVM 的 CVE，因此上了顶会
 
 ## 1. Introduction
 
