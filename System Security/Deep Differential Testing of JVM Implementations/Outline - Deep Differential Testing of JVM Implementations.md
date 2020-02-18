@@ -12,40 +12,20 @@ Ningbo, Zhejiang, China
 
 ## Summary
 
-本文基于作者三年前的工作 [Coverage-Directed Differential Testing of JVM Implementations](https://mrdrivingduck.github.io/#/markdown?repo=paper_outline&path=System%20Security%2FCoverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations%2FOutline%20-%20Coverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations.md) 继续进行
-
-之前的工作只能测试 JVM 的启动阶段 (类加载、链接、初始化)
-
-但是 JVM 内部还有很多其它模块可以被测试
-
-本文的目标是能够进一步测试 JVM 的字节码验证模块和 JVM 的执行引擎
-
-当然，为了使产生的字节码能够进入 JVM 的这两个阶段
-
-产生字节码的方式肯定要比之前工作的工作更为严格
-
-之前工作中，产生的字节码只需要保证能被 JVM 加载、链接、初始化就可以了
-
-而本文中产生的字节码不仅需要能够通过上述这三个步骤
-
-还要能够经过字节码验证模块的验证，并交给执行引擎进行执行
+本文基于作者三年前的工作 [Coverage-Directed Differential Testing of JVM Implementations](https://mrdrivingduck.github.io/#/markdown?repo=paper_outline&path=System%20Security%2FCoverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations%2FOutline%20-%20Coverage-Directed%20Differential%20Testing%20of%20JVM%20Implementations.md) 继续进行。之前的工作只能测试 JVM 的启动阶段 (类加载、链接、初始化)，但是 JVM 内部还有很多其它模块可以被测试。本文的目标是能够进一步测试 JVM 的字节码验证模块和 JVM 的执行引擎 - 当然，为了使产生的字节码能够进入 JVM 的这两个阶段，产生字节码的方式肯定要比之前工作的工作更为严格。之前工作中，产生的字节码只需要保证能被 JVM 加载、链接、初始化就可以了；而本文中产生的字节码不仅需要能够通过上述这三个步骤，还要能够经过字节码验证模块的验证，并交给执行引擎进行执行。
 
 可能是由于本文发现了 _J9_ JVM 的 CVE，因此上了顶会
 
 ## 1. Introduction
 
-之前的 _classfuzz_ 在语句上对字节码进行变异
-
-用于测试 JVM 实现的启动阶段 - 加载、链接、初始化
-
-但无法测试 JVM 的 __字节码验证__ 和 __执行引擎__
+之前的 _classfuzz_ 在语句上对字节码进行变异，用于测试 JVM 实现的启动阶段 - 加载、链接、初始化，但无法测试 JVM 的 __字节码验证__ 和 __执行引擎__ ：
 
 * 字节码验证确保每个 Class 文件满足链接阶段的约束
 * 执行引擎负责即时编译和执行 Java 字节码
 
-_Classfuzz_ 产生的大部分字节码文件无法深度测试 JVM 实现
+_Classfuzz_ 产生的大部分字节码文件无法深度测试 JVM 实现。
 
-本文提出了新的 __活代码变异__ 机制，用于从 seed 产生合法的、可执行的字节码
+本文提出了新的 __活代码变异__ 机制，用于从 seed 产生合法的、可执行的字节码。
 
 解决的挑战：
 
@@ -60,7 +40,7 @@ _Classfuzz_ 产生的大部分字节码文件无法深度测试 JVM 实现
 2. 修改活代码中的控制流和数据流，产生语义上不同的代码
 3. 产生的变异代码用于测试 JVM，暴露不同 JVM 的实现差异和潜在的威胁
 
-_Classming_ 使用了一种迭代式的变异代码生成方式，通过算法来判断是否要接受产生的变异代码
+_Classming_ 使用了一种迭代式的变异代码生成方式，通过算法来判断是否要接受产生的变异代码。
 
 本文的贡献：
 
@@ -72,9 +52,7 @@ _Classming_ 使用了一种迭代式的变异代码生成方式，通过算法�
 
 ## 2. An Illustrative Example
 
-与之前的工作类似，还是使用 _Soot_ 框架对字节码进行重写
-
-将字节码文件转换为 _Soot_ 的 _Jimple_ 代码，修改，然后生成字节码 dump 到文件中
+与之前的工作类似，还是使用 _Soot_ 框架对字节码进行重写。将字节码文件转换为 _Soot_ 的 _Jimple_ 代码，修改，然后生成字节码 dump 到文件中：
 
 在代码中插入了改变控制流的语句，不同 JVM 实现产生了不同的行为：
 
@@ -86,9 +64,7 @@ _Classming_ 使用了一种迭代式的变异代码生成方式，通过算法�
 
 ## 3. Approach
 
-总体的思路是，不断地产生，并有选择性地接收产生的 test case
-
-用 test case 在不同的 JVM 实现上执行，目标是观测到一些感兴趣的差异：
+总体的思路是，不断地产生，并有选择性地接受产生的 test case。用 test case 在不同的 JVM 实现上执行，目标是观测到一些感兴趣的差异：
 
 * JVM crashes
 * 字节码验证过程中的差异
@@ -96,9 +72,7 @@ _Classming_ 使用了一种迭代式的变异代码生成方式，通过算法�
 
 ### 3.1 Live Bytecode Mutation
 
-活代码指的是会被 JVM 在运行时执行到的字节码指令序列
-
-LBC 变异的算法步骤：
+活代码指的是会被 JVM 在运行时执行到的字节码指令序列。LBC 变异的算法步骤如下。
 
 #### 3.1.1 Select LBC Mutators
 
@@ -110,28 +84,18 @@ LBC 变异的算法步骤：
 * `lookupswitch`
 * `tableswitch`
 
-因为只有这五条指令可以在运行时改变程序控制流
-
-算法选择一个指令插入到字节码中
-
-当然，一个已经被插入到字节码中的指令也可以被移除
+因为只有这五条指令可以在运行时改变程序控制流，算法选择一个指令插入到字节码中。当然，一个已经被插入到字节码中的指令也可以被移除。
 
 #### 3.1.2 Select Methods to Mutate
 
-在每一轮迭代中，选择一个类函数进行变异
-
-具有复杂结构和指令更多的函数应当被变异地更频繁
-
-而不是随机挑选一个函数进行变异
+在每一轮迭代中，选择一个类函数进行变异。具有复杂结构和指令更多的函数应当被变异地更频繁，而不是随机挑选一个函数进行变异。
 
 定义一个函数的变异 _潜力_ - `potential(m) = #inst / #mutation`
 
 * `#inst` 代表指令条数
 * `#mutation` 代表该函数被变异的次数
 
-函数的潜力越高，就越容易被选中进行变异，在变异后，函数的潜力下降
-
-选择不同函数的概率满足几何分布，使得潜力越高的函数有更高的概率被选中
+函数的潜力越高，就越容易被选中进行变异。在变异后，函数的潜力下降。选择不同函数的概率满足几何分布，使得潜力越高的函数有更高的概率被选中。
 
 #### 3.1.3 Insert Hooking Instructions
 
@@ -162,15 +126,11 @@ _Classming_ 与 _classfuzz_ 类似，以一定指标来判断是否留下变异�
 Seed coverage 定义为 `cov(g) = y / x`
 
 * `x` 为所有的指令
-* `y` 为变异后的 test case 在 JVM 上运行时可以被覆盖到
+* `y` 为变异后的 test case 在 JVM 上运行时可以被覆盖到的指令
 
 #### 3.2.2 A Sampling Process
 
-算法需要选择将部分变异后的 test case 留下，作为新的 seed
-
-算法的目标是以指定的概率分布接受样本序列，文章中选取的是 _指数分布_
-
-产生 test case 后，运行该 test case 得到 seed coverage，计算出接受概率
+算法需要选择将部分变异后的 test case 留下，作为新的 seed。算法的目标是以指定的概率分布接受样本序列，文章中选取的是 _指数分布_ - 产生 test case 后，运行该 test case 得到 seed coverage，计算出接受概率：
 
 * 对于可以被 JVM 运行的 test case (活代码)，以接受概率为概率接受它
 * 对于不能被 JVM 运行的死代码，则拒绝
@@ -187,7 +147,7 @@ Seed coverage 定义为 `cov(g) = y / x`
 * _Clrandom_ - 随机修改控制流和数据流
 * _Clgreedy_ - 在接受变异后 test case 时，只保留能使累计 seed coverage 增加的 test case
 
-以 Java 9 的 HotSpot JVM 作为参考 JVM，用于 test case 的 coverage 数据的收集和选择
+以 Java 9 的 HotSpot JVM 作为参考 JVM，用于 test case 的 coverage 数据的收集和选择。
 
 衡量指标：
 
@@ -208,33 +168,21 @@ Seed coverage 定义为 `cov(g) = y / x`
 
 ### 4.2 RQ1: Sufficiency of Classming-generated Mutants
 
-_Classfuzz_ 的 stillborn rate 显著较高，因为其产生了大量的不合法 test case，甚至无法被 _Soot_ 转换为字节码文件
-
-因此，基于活代码的变异更为有效
+_Classfuzz_ 的 stillborn rate 显著较高，因为其产生了大量的不合法 test case，甚至无法被 _Soot_ 转换为字节码文件。因此，基于活代码的变异更为有效。
 
 ### 4.3 RQ2: Effectiveness of Classming-generated Mutants
 
 #### 4.3.1 Accumulative Seed Coverage
 
-_Classming_ 的 accumulative seed coverage 高于 _clgreedy_
-
-说明算法使得 _classming_ 能更合理地探索种子的变异空间
+_Classming_ 的 accumulative seed coverage 高于 _clgreedy_ ，说明算法使得 _classming_ 能更合理地探索种子的变异空间。
 
 #### 4.3.2 JVM Code Coverage
 
-_Classming_ 使得 JVM 的 code coverage 有所提高
-
-特别地，字节码验证模块、即时编译器的 coverage 占增多部分的 72.1%
-
-说明变异产生的 test case 能更好地测试 JVM 的字节码验证模块和执行引擎
+_Classming_ 使得 JVM 的 code coverage 有所提高。特别地，字节码验证模块、即时编译器的 coverage 占增多部分的 72.1%。说明变异产生的 test case 能更好地测试 JVM 的字节码验证模块和执行引擎。
 
 #### 4.3.3 JVM Differences
 
-只有 _classming_ 产生的 test case 引发了 JVM 字节码验证部分的行为差异
-
-另外，行为差异也有可能是冗余的，有意义的指标应该是行为差异的唯一种类
-
-_Classming_ 能够触发更多种独立的 JVM 行为差异
+只有 _classming_ 产生的 test case 引发了 JVM 字节码验证部分的行为差异。另外，行为差异也有可能是冗余的，有意义的指标应该是行为差异的唯一种类 - _Classming_ 能够触发更多种独立的 JVM 行为差异。
 
 ### 4.4 RQ3: Difference Analysis and Bug Report
 
