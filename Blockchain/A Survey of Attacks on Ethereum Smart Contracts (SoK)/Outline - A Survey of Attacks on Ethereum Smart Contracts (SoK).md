@@ -56,7 +56,7 @@ Smart contracts 是无需外部可信的第三方机构，就能在互不信任�
 
 在理想情况下，每次函数调用会被以太坊网络中的所有矿工执行。矿工能够得到函数调用者支付的执行费。除了作为报酬，执行费可用于防止 DoS 攻击 - 攻击者可能通过耗时的计算来拖慢网络。
 
-执行费被定义为 _gas_，可被理解为燃料，是用户支付的用于执行代码的开销。用户支付的费用越高，矿工有越高的几率执行这样的 transaction (矿工可以自由选择将哪些 transactions 上链，通常来说优先选择报酬更高的)。每个 EVM 操作都会消耗特定数量的 gas，总体消耗量取决于矿工执行操作的完整序列。
+执行费被定义为 _gas_ ，可被理解为燃料，是用户支付的用于执行代码的开销。用户支付的费用越高，矿工有越高的几率执行这样的 transaction (矿工可以自由选择将哪些 transactions 上链，通常来说优先选择报酬更高的)。每个 EVM 操作都会消耗特定数量的 gas，总体消耗量取决于矿工执行操作的完整序列。
 
 矿工会正常执行 transaction，直到正常终止，除非抛出异常
 
@@ -159,7 +159,7 @@ contract Bob {
 
 ### 3.3 Gasless Send
 
-函数 `send()` 与 `call()` 类似的方式会被编译为一个空签名的函数，因此被调用方的 fallback 将会被调用。用于执行 fallback 的 gas 绑定为 2300 单位，只够执行有限数量的字节码指令。
+函数 `send()` 与 `call()` 类似，会被编译为一个空签名的 `call()` 函数，因此被调用方的 fallback 将会被调用。用于执行 fallback 的 gas 固定为 2300 单位，只够执行有限数量的字节码指令。
 
 因此，`send()` 只有在两种情况下才会成功：
 
@@ -568,7 +568,7 @@ contract Bob {
 library MaliciousSet {
   address constant attackerAddr = 0x42;
   function version() returns(uint) {
-    addackerAddr.send(this.balance);
+    attackerAddr.send(this.balance);
     return 1;
   }
 }
