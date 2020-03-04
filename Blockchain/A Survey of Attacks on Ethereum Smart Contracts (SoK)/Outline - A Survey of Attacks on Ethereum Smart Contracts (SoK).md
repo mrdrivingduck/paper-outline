@@ -50,7 +50,7 @@ Smart contracts 是无需外部可信的第三方机构，就能在互不信任�
 
 对于合约的编程，一般不会直接使用 EVM 字节码，而是使用类 JavaScript 的编程语言 Solidity。直观地说，合约能够接收并保存其它用户支付的 _ether_，也能通过函数将 _ether_ 发送给其它用户。
 
-合约由 fields 和 functions 组成。用户可以通过向以太坊结点发送合适的 transaction，来调用合约中的函数，在 transaction 中需要包含支付给矿工的手续费，可能还包含了调用者支付给合约的 _ether_。当合约中的程序执行异常时，手续费丢失，其它副作用 (包括 _ether_ 转账) 将会被复原。
+合约由 fields 和 functions 组成。用户可以通过向以太坊结点发送合适的 transaction，来调用合约中的函数，在 transaction 中需要包含支付给矿工的手续费，可能还包含了调用者支付给合约的 _ether_ 。当合约中的程序执行异常时，手续费丢失，其它副作用 (包括 _ether_ 转账) 将会被复原。
 
 ### 2.2 Execution Fees
 
