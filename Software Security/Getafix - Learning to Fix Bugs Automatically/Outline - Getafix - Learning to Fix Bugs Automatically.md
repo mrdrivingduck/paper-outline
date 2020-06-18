@@ -1,6 +1,6 @@
 # Outline
 
-## Getafix - Learning to Fix Bugs Automatically - S&P 2020
+## Getafix: Learning to Fix Bugs Automatically - S&P 2020
 
 Created by : Mr Dk.
 
