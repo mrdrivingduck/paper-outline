@@ -8,7 +8,7 @@ Nanjing, Jiangsu, China
 
 ---
 
-Backup the papers I have read with comments.
+🔍 To record the papers I have read.
 
-The files in the repository is no longer updated. New updates are maintained in [issues](https://github.com/mrdrivingduck/paper-outline/issues) pages, since it is a more popular and flexible way.
+The files in the repository are no longer updated. New updates are maintained in [issues](https://github.com/mrdrivingduck/paper-outline/issues) pages, since it is a more popular and flexible way.
 
