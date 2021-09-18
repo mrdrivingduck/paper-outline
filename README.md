@@ -1,4 +1,4 @@
-# paper-outline
+# paper-outline (Archived)
 
 Created by : Mr Dk.
 
@@ -10,7 +10,5 @@ Nanjing, Jiangsu, China
 
 Backup the papers I have read with comments.
 
-And I will write an outline for each paper I have read.
-
----
+The files in the repository is no longer updated. New updates are maintained in [issues](https://github.com/mrdrivingduck/paper-outline/issues) pages, since it is a more popular and flexible way.
 
